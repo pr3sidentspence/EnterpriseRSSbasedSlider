@@ -1,5 +1,11 @@
 // This script takes the rss feed from an Enterprise search and outputs html in the format expected by
 // bxSlider (https://bxslider.com/) and then calls bxSlider.
+// Please replace all "client=winnip" with your syndetics identifier
+// The profile the RSS feed is loaded from must have ISBN displayed in search results
+//		you can create a profile for this and then edit the links to point to your normal profile
+
+
+var jnc = jQuery.noConflict();
 
 function populateFeedData() {
 	// Gets Atom Feed in FEED_URL and goes through entries 1 by 1
@@ -7,10 +13,12 @@ function populateFeedData() {
 	// makes the slider items and the anchors that bxslider uses to make the thumbnail pager
 	// Due to size limits on Enterprise centre column, pager limits to 15 items regardless of number of
 	// entries in feed
+
+
 	// Typical URL
 	//FEED_URL = "/client/rss/hitlist/default/qu=search+terms+here";
 	FEED_URL = "/client/rss/hitlist/default/qu=search+terms+here";
-	$J.get(FEED_URL, function (data) {
+	jnc.get(FEED_URL, function (data) {
 		processData(data);
 	});
 }
@@ -19,13 +27,13 @@ function processData(data) {
 	var pagerAnchors = "";
 	var i = 0;
 	var j = 0;
-	$J(data).find("entry").each(function () { // or "item" or whatever suits
-		var el = $J(this);
+	jnc(data).find("entry").each(function () { // or "item" or whatever suits
+		var el = jnc(this);
 		var isbnPatt = new RegExp("ISBN&#160;([0-9]*)<");
 		var isbn = isbnPatt.exec(el.find("content").text());
 		if (isbn) {
 			isbn = isbn[1];
-			var authorPatt = new RegExp("Author&#160;(.*?),(.*?)(,|<)");
+			var authorPatt = new RegExp("Author&#160;(.*?),(.*?)(,|<)"); //change "Author" here to whatever your Enterprise uses
 			var author = authorPatt.exec(el.find("content").text());
 			if (author !== null) {
 				var firstName = author[2].replace(/[\.,-\/#!$%\^&\*;:{}=\-_`~()]/g, ""); //removes problematic characters if present
@@ -51,8 +59,8 @@ function processData(data) {
 	});
 	document.getElementById("bsSlider").innerHTML = bsList;
 	document.getElementById("bx-pager").innerHTML = pagerAnchors;
-	$J(document).ready(function () {
-		$J('#bsSlider').bxSlider({
+	jnc(document).ready(function () {
+		jnc('#bsSlider').bxSlider({
 			mode: 'fade',
 			captions: true,
 			auto: true,
